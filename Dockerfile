@@ -1,8 +1,8 @@
 FROM node:latest
 
-WORKDIR /app
+WORKDIR /usr/src
 
-COPY package*.json ./
+COPY [".", "/usr/src/"]
 RUN npm install
 EXPOSE 3000
 

@@ -1,28 +1,23 @@
-const express = require("express");
-const mongoose = require("mongoose");
+const express = require('express')
+const app = express()
+const port = 3000
 
-const app = express();
+const MongoClient = require('mongodb').MongoClient
 
-// URL de conexión a la base de datos de MongoDB
-const MONGO_URL = "mongodb://localhost:27017/mydatabase";
+// Connection URL
+const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/testdb';
 
-// Conexión a la base de datos de MongoDB
-mongoose.connect(MONGO_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  console.log("Conexión exitosa a la base de datos de MongoDB");
-}).catch((error) => {
-  console.log("Error al conectarse a la base de datos de MongoDB:", error);
+app.get('/', (req, res) => {
+  MongoClient.connect(mongoUrl, { useNewUrlParser: true }, (err, db) => {
+    if (err) {
+      res.status(500).send('💥 BOOM 💥: ' + err);
+      console.log("Error al conectarse a la base de datos de MongoDB:"+ err);
+    } else {
+      res.send('Me conecté a la DB! 😎');
+      console.log("Conexión exitosa a la base de datos de MongoDB");
+      db.close();
+    }
+  });
 });
 
-// Ruta de prueba para verificar si la aplicación está conectada a la base de datos
-app.get("/", (req, res) => {
-  res.send("¡La aplicación está conectada a la base de datos de MongoDB!");
-});
-
-// Puerto en el que la aplicación escuchará las solicitudes
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`La aplicación está escuchando en el puerto ${PORT}`);
-});
+app.listen(port, () => console.log(`Server listening on port ${port}!`))
